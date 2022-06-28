@@ -24,9 +24,8 @@ def call_method(method, data):
     return None
   if result.status_code == 200:
     return json.loads(result.content)
-  else:
-    logging.error(result.content)
-    return None
+  logging.error(result.content)
+  return None
 
 
 def shorten_url(long_url):

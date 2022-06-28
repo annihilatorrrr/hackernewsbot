@@ -28,12 +28,6 @@ def decode(string, alphabet=ALPHABET):
   """
   base = len(alphabet)
   strlen = len(string)
-  num = 0
-
-  idx = 0
-  for char in string:
-    power = (strlen - (idx + 1))
-    num += alphabet.index(char) * (base ** power)
-    idx += 1
-
-  return num
+  return sum(
+      alphabet.index(char) * base**((strlen - (idx + 1)))
+      for idx, char in enumerate(string))

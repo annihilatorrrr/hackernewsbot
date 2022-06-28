@@ -37,7 +37,7 @@ def comments_redirect(short_id):
     story_id = str(shortener.decode(short_id))
   except:
     return abort(400)
-  hn_url = "https://news.ycombinator.com/item?id={}".format(story_id)
+  hn_url = f"https://news.ycombinator.com/item?id={story_id}"
   return redirect(hn_url)
 
 
@@ -97,4 +97,4 @@ def page_not_found(e):
 @app.errorhandler(500)
 def application_error(e):
   """Return a custom 500 error."""
-  return 'Sorry, unexpected error: {}'.format(e), 500
+  return f'Sorry, unexpected error: {e}', 500

@@ -23,9 +23,8 @@ def call_method(method, data):
     return None
   if result.status_code == 200:
     return json.loads(result.content)
-  else:
-    logging.error(result.content)
-    return None
+  logging.error(result.content)
+  return None
 
 
 def send_message(chat_id, text, reply_markup=None, parse_mode='HTML',

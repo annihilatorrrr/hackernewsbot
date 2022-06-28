@@ -29,8 +29,8 @@ def topstories():
 
 
 def item_async(id, callback):
-  return call_method_async("item/{}".format(id), callback)
+  return call_method_async(f"item/{id}", callback)
 
 
 def item(id):
-  return call_method("item/{}".format(id))
+  return call_method(f"item/{id}")

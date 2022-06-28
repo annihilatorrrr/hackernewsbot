@@ -34,34 +34,34 @@ class StoryPost(ndb.Model):
     story_id_int = story.get('id')
     story_id = str(story_id_int)
     short_id = shortener.encode(story_id_int)
-    hn_url = "https://news.ycombinator.com/item?id={}".format(story_id)
+    hn_url = f"https://news.ycombinator.com/item?id={story_id}"
     story_url = story.get('url')
 
     # Check memcache and databse, maybe this story was already sent
     if memcache.get(story_id):
-      logging.info('STOP: {} in memcache'.format(story_id))
+      logging.info(f'STOP: {story_id} in memcache')
       return
     post = ndb.Key(cls, story_id).get()
     if post:
-      logging.info('STOP: {} in DB'.format(story_id))
+      logging.info(f'STOP: {story_id} in DB')
       post.add_memcache()
       return
-    logging.info('SEND: {}'.format(story_id))
+    logging.info(f'SEND: {story_id}')
 
     story['title'] = story.get('title').encode('utf-8')
     comments_count = story.get('descendants', 0)
     buttons = []
 
     if development():
-      short_hn_url = 'http://localhost:8080/c/{}'.format(short_id)
+      short_hn_url = f'http://localhost:8080/c/{short_id}'
     else:
-      short_hn_url = 'https://readhacker.news/c/{}'.format(short_id)
+      short_hn_url = f'https://readhacker.news/c/{short_id}'
 
     if story_url:
       if development():
-        short_url = 'http://localhost:8080/s/{}'.format(short_id)
+        short_url = f'http://localhost:8080/s/{short_id}'
       else:
-        short_url = 'https://readhacker.news/s/{}'.format(short_id)
+        short_url = f'https://readhacker.news/s/{short_id}'
       buttons.append({
           'text': 'Read',
           'url': story_url
@@ -70,10 +70,7 @@ class StoryPost(ndb.Model):
       short_url = short_hn_url
       story['url'] = hn_url
 
-    buttons.append({
-        'text': '{}+ Comments'.format(comments_count),
-        'url': hn_url
-    })
+    buttons.append({'text': f'{comments_count}+ Comments', 'url': hn_url})
 
     # Get the difference between published date and when 100+ score was reched
     now = datetime.datetime.now()
@@ -94,18 +91,16 @@ class StoryPost(ndb.Model):
         ago=ago, status_emoji=status_emoji, **story)
 
     # Add link
-    message += '<b>Link:</b> {}\n'.format(short_url)
+    message += f'<b>Link:</b> {short_url}\n'
 
     # Add comments Link(don't add it for `Ask HN`, etc)
     if story_url:
-      message += '<b>Comments:</b> {}\n'.format(short_hn_url)
+      message += f'<b>Comments:</b> {short_hn_url}\n'
 
-    # Add text
-    text = story.get('text')
-    if text:
+    if text := story.get('text'):
       text = text.replace('<p>', '\n').replace('&#x27;', "'") \
                  .replace('&#x2F;', '/').encode('utf-8')
-      message += "\n{}\n".format(text)
+      message += f"\n{text}\n"
 
     # Send to the telegram channel
     if development():
@@ -115,7 +110,7 @@ class StoryPost(ndb.Model):
       result = send_message('@hacker_news_feed', message,
                             {'inline_keyboard': [buttons]})
 
-    logging.info('Telegram response: {}'.format(result))
+    logging.info(f'Telegram response: {result}')
 
     telegram_message_id = None
     if result and result.get('ok'):

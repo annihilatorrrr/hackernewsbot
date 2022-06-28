@@ -8,7 +8,6 @@ def development():
 
 
 def shorten_url(long_url):
-  short_url = bitly_shorten(long_url)
-  if short_url:
+  if short_url := bitly_shorten(long_url):
     return short_url.get('url')
   return googl_shorten(long_url).get('id')
